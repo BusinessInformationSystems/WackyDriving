@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -67,16 +69,28 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         }
+    }
 
-        // Open the connection
-        connect();
+    public void sendTest(View view){
+        EditText cmdBox = (EditText)findViewById(R.id.cmdBox);
+        TextView textarea = (TextView)findViewById(R.id.textView);
+        String msg = cmdBox.getText().toString();
+        textarea.append("\nSending..."+msg);
+        Log.d(TAG,"\nSending..."+msg);
 
+        byte[] msgBuffer = msg.getBytes();
+        try{
+            outStream.write(msgBuffer);
+        } catch (IOException e) {
+            Log.d(TAG, "Unable to get in/out stream");
+            e.printStackTrace();
+        }
     }
 
     /*
         Open the connection and gets input and output streams
      */
-    public void connect() {
+    public void connect(View view) {
         try {
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); //Standard SerialPortService ID
             // Create an RFCOMM BluetoothSocket ready to start
