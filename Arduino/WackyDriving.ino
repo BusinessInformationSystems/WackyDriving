@@ -11,6 +11,8 @@ int drivingMotorDirectionPinA    = 12;
 int drivingMotorDirectionPinB    = 13;
 int drivingMotorSpeedPin         = 10;
 
+int buzzerPin                    = 5;
+
 SoftwareSerial BlueToothSerial(RxD,TxD);
 char flag=1;
 
@@ -22,6 +24,12 @@ void setupMotor()
   pinMode(drivingMotorDirectionPinA,OUTPUT);
   pinMode(drivingMotorDirectionPinB,OUTPUT);
   pinMode(drivingMotorSpeedPin,OUTPUT);
+}
+
+void setupBuzzer()
+{
+  pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, LOW);   
 }
 
 void Test_BlueTooth()
@@ -83,9 +91,34 @@ void setupBlueTooth()
   while(flag);
 }
 
+void playNote(char note, int duration) 
+{   
+  char names[] = { 'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C' };   
+  int tones[] = { 1915, 1700, 1519, 1432, 1275, 1136, 1014, 956 };     // play the tone corresponding to the note name   
+  for (int i = 0; i < 8; i++)   
+  {     
+    if (names[i] == note) 
+    {       
+        playTone(tones[i], duration);     
+    }   
+  } 
+}   
+
+void playTone(int tone, int duration) 
+{   
+  for (long i = 0; i < duration * 1000L; i += tone * 2) 
+  {     
+      digitalWrite(buzzerPin, HIGH);     
+      delayMicroseconds(tone);     
+      digitalWrite(buzzerPin, LOW);     
+      delayMicroseconds(tone);   
+  } 
+}   
+
 void setup()
 {
   setupMotor();
+  setupBuzzer();
   Serial.begin(38400);     
   BlueToothSerial.begin(38400); 
   delay(500);
@@ -202,31 +235,43 @@ void processCommand(String input)
   {
     processTurn(input);
   }
+  else if(aCommand == "HH")
+  {
+    honkTheHorn(); 
+  }
   else
   {
     Serial.println("Command was unrecognized.");
   }
 }
 
-String aString;
-
-void loop()
+void honkTheHorn()
 {
   /*
-   analogWrite(drivingMotorSpeedPin,0);
-   digitalWrite(drivingMotorDirectionPinA,HIGH);
-   digitalWrite(drivingMotorDirectionPinB,LOW);
-   Serial.print("Speed set");
-   
-   */
-
-  /*
-  if(BlueToothSerial.available())
-   {
-   Serial.print(char(BlueToothSerial.read()));
-   }
-   */
-
+  char notes[] = "ccggaagffeeddc";
+  int beats[] = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 4 }; 
+  int tempo = 300;   
+  int length = 15; // the number of notes
+  
+  for (int i = 0; i < length; i++) 
+  {     
+     if (notes[i] == ' ') 
+     {       
+         delay(beats[i] * tempo); // rest     
+     }
+     else 
+     {       
+        playNote(notes[i], beats[i] * tempo);     
+     }       // pause between notes     
+     delay(tempo / 2);    
+  } 
+  */
+  playNote('c',300);
+  Serial.println("Honking the Horn!");
+}
+String aString;
+void loop()
+{  
   // Read from the Bluetooth serial and process the command
   while (BlueToothSerial.available() > 0)
   {
