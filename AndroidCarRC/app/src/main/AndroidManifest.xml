@@ -20,12 +20,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ControllerActivity"
+            android:name=".AdvancedController"
             android:label="Controller" >
         </activity>
         <activity
             android:name=".BasicController"
             android:label="@string/title_activity_basic_controller" >
+        </activity>
+        <activity
+            android:name=".ScalingAnimation"
+            android:label="@string/title_activity_scaling_animation" >
         </activity>
     </application>
 

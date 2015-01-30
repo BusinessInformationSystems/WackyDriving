@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
     public void showController(View v){
         // Show Controller activity
 
-        Intent intent = new Intent(this, BasicController.class);
+        Intent intent = new Intent(this, AdvancedController.class);
         startActivity(intent);
     }
 
