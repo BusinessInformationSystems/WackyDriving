@@ -82,9 +82,9 @@ public class AdvancedController extends Activity implements View.OnTouchListener
                 float diffX = x - originX;
 
                 if(diffX > 30){ // Right -> scale by X2
-                    sendMsg("TWR "+calculateMotorValue(convertPxToDp(diffX)*3));
+                    sendMsg("TWR "+calculateMotorValue(convertPxToDp(diffX)*4));
                 }else if(diffX < -30){ // Left -> scale by X2
-                    sendMsg("TWL "+calculateMotorValue(convertPxToDp(diffX)*3));
+                    sendMsg("TWL "+calculateMotorValue(convertPxToDp(diffX)*4));
                 }else {
                     sendMsg("TWR 0");
                 }
@@ -100,7 +100,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
 
                 // Send cmd to Device
             }
-        }else if(event.getAction() == MotionEvent.ACTION_UP){
+        }else if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL){
             originX = 0;
             originY = 0;
             isTouching = false;
