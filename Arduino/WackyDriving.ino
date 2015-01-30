@@ -101,25 +101,58 @@ int parseValue(String input)
 }
 void moveForward(String input)
 {
+  // parse the value
   int value = parseValue(input);
+  
+  // spin up the motor
+  analogWrite(drivingMotorSpeedPin, value);
+  digitalWrite(drivingMotorDirectionPinA, HIGH);
+  digitalWrite(drivingMotorDirectionPinB, LOW);  
+
+  // print what is happening
   Serial.print("Moving forward with speed ");
   Serial.println(value);
+  
 }
 void moveBackward(String input)
 {
+  // parse the value
   int value = parseValue(input);
+  
+  // spin up the motor
+  analogWrite(drivingMotorSpeedPin, value);
+  digitalWrite(drivingMotorDirectionPinA, LOW);  
+  digitalWrite(drivingMotorDirectionPinB, HIGH);
+  
+  // print what is happening
   Serial.print("Moving backward with speed ");
   Serial.println(value);
 }
 void steerLeft(String input)
 {
+  // parse the value
   int value = parseValue(input);
+  
+  // spin up the motor
+  analogWrite(steeringMotorSpeedPin, value);
+  digitalWrite(steeringMotorDirectionPinA, HIGH);  
+  digitalWrite(steeringMotorDirectionPinB, LOW);  
+  
+  // print what is happening
   Serial.print("Steering left with speed ");
   Serial.println(value);
 }
 void steerRight(String input)
 {
+  // parse the value
   int value = parseValue(input);
+  
+  // spin up the motor
+  analogWrite(steeringMotorSpeedPin, value);
+  digitalWrite(steeringMotorDirectionPinA, LOW);
+  digitalWrite(steeringMotorDirectionPinB, HIGH);  
+  
+  // print what is happening
   Serial.print("Steering right with speed ");
   Serial.println(value);
 }
@@ -179,7 +212,8 @@ String aString;
 
 void loop()
 {
-  /*    analogWrite(drivingMotorSpeedPin,0);
+  /*
+   analogWrite(drivingMotorSpeedPin,0);
    digitalWrite(drivingMotorDirectionPinA,HIGH);
    digitalWrite(drivingMotorDirectionPinB,LOW);
    Serial.print("Speed set");
