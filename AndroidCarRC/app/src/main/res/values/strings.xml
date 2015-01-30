@@ -3,4 +3,7 @@
 
     <string name="app_name">Android CarRC</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_basic_controller">BasicController</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

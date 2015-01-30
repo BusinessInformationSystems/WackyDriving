@@ -27,16 +27,7 @@ public class MainActivity extends ActionBarActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private BluetoothAdapter bluetooth; //Bluetooth radio adapter
-    private BluetoothDevice remoteDevice; //remote bluetooth device
-    private BluetoothSocket btSocket;
-    private OutputStream outStream;
-    private InputStream inStream;
-    private boolean stopWorker = false;
-    private byte delimiter = 10;
-    private int readBufferPosition = 0;
-    private byte[] readBuffer = new byte[1024];
-    private Handler handler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +35,10 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         // Get the default bluetooth adapter (Bluetooth radio)
-        bluetooth = BluetoothAdapter.getDefaultAdapter();
+        CarARCApp.bluetooth = BluetoothAdapter.getDefaultAdapter();
 
         // Check to see if bluetooth is enabled on the device and request that it be turned on if it's not
-        if(!bluetooth.isEnabled())
+        if(!CarARCApp.bluetooth.isEnabled())
         {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetooth, 1);
@@ -57,24 +48,13 @@ public class MainActivity extends ActionBarActivity {
 //        Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 //        startActivityForResult(enableBluetooth, 0);
 
-        // Get a reference to our Arduino’s bluetooth device
-        Set <BluetoothDevice>pairedDevices = bluetooth.getBondedDevices(); //This will connect only with devices to which the phone has been paired before
-        if(pairedDevices.size() > 0) {
-            for(BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                if(device.getName().equals("WackyDriving")) // Change this to match the name of your device
-                {
-                    remoteDevice = device;
-                    break;
-                }
-            }
-        }
+
     }
 
     public void showController(View v){
         // Show Controller activity
 
-        Intent intent = new Intent(this, ControllerActivity.class);
+        Intent intent = new Intent(this, BasicController.class);
         startActivity(intent);
     }
 
@@ -87,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
 
         byte[] msgBuffer = msg.getBytes();
         try{
-            outStream.write(msgBuffer);
+            CarARCApp.outStream.write(msgBuffer);
         } catch (IOException e) {
             Log.d(TAG, "Unable to get in/out stream");
             e.printStackTrace();
@@ -98,53 +78,79 @@ public class MainActivity extends ActionBarActivity {
         Open the connection and gets input and output streams
      */
     public void connect(View view) {
+        final TextView textarea = (TextView)findViewById(R.id.textView);
         try {
+            // Get a reference to our Arduino’s bluetooth device
+            textarea.append("Searching for Device...\n");
+            Set <BluetoothDevice>pairedDevices = CarARCApp.bluetooth.getBondedDevices(); //This will connect only with devices to which the phone has been paired before
+            if(pairedDevices.size() > 0) {
+                for(BluetoothDevice device : pairedDevices) {
+                    String deviceName = device.getName();
+                    if(device.getName().equals("WackyDriving")) // Change this to match the name of your device
+                    {
+                        textarea.append("Found Device.\n");
+                        CarARCApp.remoteDevice = device;
+                        break;
+                    }
+                }
+            }
+
+
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); //Standard SerialPortService ID
             // Create an RFCOMM BluetoothSocket ready to start
             // a secure outgoing connection to this remote device using SDP lookup of uuid.
             // As client
-            btSocket = remoteDevice.createRfcommSocketToServiceRecord(uuid);
-            btSocket.connect();
+
+
+            textarea.append("Creating Socket...\n");
+            CarARCApp.btSocket = CarARCApp.remoteDevice.createRfcommSocketToServiceRecord(uuid);
+
+            textarea.append("Connecting...\n");
+            CarARCApp.btSocket.connect();
+            textarea.append("Connected.\n");
         } catch (IOException e) {
+
+            textarea.append("Socket creation failed.\n");
+            Log.d(TAG, "Socket creation failed");
+            e.printStackTrace();
             try {
-                btSocket.close();
+                CarARCApp.btSocket.close();
+                textarea.append("Socket Closed\n");
             } catch (IOException e2) {
                 Log.d(TAG, "Unable to close the connection");
             }
-            Log.d(TAG, "Socket creation failed");
-            e.printStackTrace();
         }
 
         try {
-            final TextView textarea = (TextView)findViewById(R.id.textView);
+
             textarea.setTextSize(20);
 
-            outStream = btSocket.getOutputStream();
-            inStream = btSocket.getInputStream();
+            CarARCApp.outStream = CarARCApp.btSocket.getOutputStream();
+            CarARCApp.inStream = CarARCApp.btSocket.getInputStream();
 
             Thread workerThread = new Thread(new Runnable()
             {
                 public void run()
                 {
-                    while(!Thread.currentThread().isInterrupted() && !stopWorker)
+                    while(!Thread.currentThread().isInterrupted() && !CarARCApp.stopWorker)
                     {
                         try
                         {
-                            int bytesAvailable = inStream.available();
+                            int bytesAvailable = CarARCApp.inStream.available();
                             if(bytesAvailable > 0)
                             {
                                 byte[] packetBytes = new byte[bytesAvailable];
-                                inStream.read(packetBytes);
+                                CarARCApp.inStream.read(packetBytes);
                                 for(int i=0;i<bytesAvailable;i++)
                                 {
                                     byte b = packetBytes[i];
-                                    if(b == delimiter)
+                                    if(b == CarARCApp.delimiter)
                                     {
-                                        byte[] encodedBytes = new byte[readBufferPosition];
-                                        System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                        byte[] encodedBytes = new byte[CarARCApp.readBufferPosition];
+                                        System.arraycopy(CarARCApp.readBuffer, 0, encodedBytes, 0, encodedBytes.length);
                                         final String data = new String(encodedBytes, "US-ASCII");
-                                        readBufferPosition = 0;
-                                        handler.post(new Runnable()
+                                        CarARCApp.readBufferPosition = 0;
+                                        CarARCApp.handler.post(new Runnable()
                                         {
                                             public void run()
                                             {
@@ -155,14 +161,14 @@ public class MainActivity extends ActionBarActivity {
                                     }
                                     else
                                     {
-                                        readBuffer[readBufferPosition++] = b;
+                                        CarARCApp.readBuffer[CarARCApp.readBufferPosition++] = b;
                                     }
                                 }
                             }
                         }
                         catch (IOException ex)
                         {
-                            stopWorker = true;
+                            CarARCApp.stopWorker = true;
                         }
                     }
                 }
@@ -182,7 +188,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
-            btSocket.close();
+            CarARCApp.btSocket.close();
         } catch (IOException e) {
             Log.d(TAG, "Unable to close properly the connection");
         }
