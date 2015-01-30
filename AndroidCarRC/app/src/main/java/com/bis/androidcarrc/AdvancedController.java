@@ -65,7 +65,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
             moveImageToPoint(R.id.padBGImageView,originX,originY);
 
         }else if (event.getAction() == MotionEvent.ACTION_MOVE){
-
+            moveImageToPoint(R.id.padBGImageView,x,y);
             if(isTouching){
 
                 // Get the difference of movement from Origin
