@@ -11,11 +11,19 @@
         />
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:scaleType="centerInside"
         android:id="@+id/padBGImageView"
-        android:visibility="invisible"
+        android:visibility="visible"
         android:src="@drawable/rb_analog_bg"
+        />
+    <ImageView
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:scaleType="centerInside"
+        android:id="@+id/padThumbImageView"
+        android:visibility="visible"
+        android:src="@drawable/toggle_thumb_image"
         />
 </RelativeLayout>
