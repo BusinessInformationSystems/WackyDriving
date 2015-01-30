@@ -5,10 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import java.io.IOException;
 
@@ -50,7 +47,7 @@ public class BasicController extends ActionBarActivity implements SeekBar.OnSeek
         msg = msg + "\n";
         byte[] msgBuffer = msg.getBytes();
         try{
-            CarARCApp.outStream.write(msgBuffer);
+            BTConSingleton.getInstance().outStream.write(msgBuffer);
         } catch (IOException e) {
             Log.d(TAG, "Unable to get in/out stream");
             e.printStackTrace();

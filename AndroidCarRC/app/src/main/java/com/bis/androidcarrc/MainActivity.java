@@ -2,11 +2,7 @@ package com.bis.androidcarrc;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,8 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,10 +29,10 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         // Get the default bluetooth adapter (Bluetooth radio)
-        CarARCApp.bluetooth = BluetoothAdapter.getDefaultAdapter();
+        BTConSingleton.getInstance().bluetooth = BluetoothAdapter.getDefaultAdapter();
 
         // Check to see if bluetooth is enabled on the device and request that it be turned on if it's not
-        if(!CarARCApp.bluetooth.isEnabled())
+        if(!BTConSingleton.getInstance().bluetooth.isEnabled())
         {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetooth, 1);
@@ -67,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
 
         byte[] msgBuffer = msg.getBytes();
         try{
-            CarARCApp.outStream.write(msgBuffer);
+            BTConSingleton.getInstance().outStream.write(msgBuffer);
         } catch (IOException e) {
             Log.d(TAG, "Unable to get in/out stream");
             e.printStackTrace();
@@ -82,14 +76,14 @@ public class MainActivity extends ActionBarActivity {
         try {
             // Get a reference to our Arduino’s bluetooth device
             textarea.append("Searching for Device...\n");
-            Set <BluetoothDevice>pairedDevices = CarARCApp.bluetooth.getBondedDevices(); //This will connect only with devices to which the phone has been paired before
+            Set <BluetoothDevice>pairedDevices = BTConSingleton.getInstance().bluetooth.getBondedDevices(); //This will connect only with devices to which the phone has been paired before
             if(pairedDevices.size() > 0) {
                 for(BluetoothDevice device : pairedDevices) {
                     String deviceName = device.getName();
                     if(device.getName().equals("WackyDriving")) // Change this to match the name of your device
                     {
                         textarea.append("Found Device.\n");
-                        CarARCApp.remoteDevice = device;
+                        BTConSingleton.getInstance().remoteDevice = device;
                         break;
                     }
                 }
@@ -103,10 +97,10 @@ public class MainActivity extends ActionBarActivity {
 
 
             textarea.append("Creating Socket...\n");
-            CarARCApp.btSocket = CarARCApp.remoteDevice.createRfcommSocketToServiceRecord(uuid);
+            BTConSingleton.getInstance().btSocket = BTConSingleton.getInstance().remoteDevice.createRfcommSocketToServiceRecord(uuid);
 
             textarea.append("Connecting...\n");
-            CarARCApp.btSocket.connect();
+            BTConSingleton.getInstance().btSocket.connect();
             textarea.append("Connected.\n");
         } catch (IOException e) {
 
@@ -114,7 +108,7 @@ public class MainActivity extends ActionBarActivity {
             Log.d(TAG, "Socket creation failed");
             e.printStackTrace();
             try {
-                CarARCApp.btSocket.close();
+                BTConSingleton.getInstance().btSocket.close();
                 textarea.append("Socket Closed\n");
             } catch (IOException e2) {
                 Log.d(TAG, "Unable to close the connection");
@@ -125,32 +119,32 @@ public class MainActivity extends ActionBarActivity {
 
             textarea.setTextSize(20);
 
-            CarARCApp.outStream = CarARCApp.btSocket.getOutputStream();
-            CarARCApp.inStream = CarARCApp.btSocket.getInputStream();
+            BTConSingleton.getInstance().outStream = BTConSingleton.getInstance().btSocket.getOutputStream();
+            BTConSingleton.getInstance().inStream = BTConSingleton.getInstance().btSocket.getInputStream();
 
             Thread workerThread = new Thread(new Runnable()
             {
                 public void run()
                 {
-                    while(!Thread.currentThread().isInterrupted() && !CarARCApp.stopWorker)
+                    while(!Thread.currentThread().isInterrupted() && !BTConSingleton.getInstance().stopWorker)
                     {
                         try
                         {
-                            int bytesAvailable = CarARCApp.inStream.available();
+                            int bytesAvailable = BTConSingleton.getInstance().inStream.available();
                             if(bytesAvailable > 0)
                             {
                                 byte[] packetBytes = new byte[bytesAvailable];
-                                CarARCApp.inStream.read(packetBytes);
+                                BTConSingleton.getInstance().inStream.read(packetBytes);
                                 for(int i=0;i<bytesAvailable;i++)
                                 {
                                     byte b = packetBytes[i];
-                                    if(b == CarARCApp.delimiter)
+                                    if(b == BTConSingleton.getInstance().delimiter)
                                     {
-                                        byte[] encodedBytes = new byte[CarARCApp.readBufferPosition];
-                                        System.arraycopy(CarARCApp.readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                        byte[] encodedBytes = new byte[BTConSingleton.getInstance().readBufferPosition];
+                                        System.arraycopy(BTConSingleton.getInstance().getInstance().readBuffer, 0, encodedBytes, 0, encodedBytes.length);
                                         final String data = new String(encodedBytes, "US-ASCII");
-                                        CarARCApp.readBufferPosition = 0;
-                                        CarARCApp.handler.post(new Runnable()
+                                        BTConSingleton.getInstance().readBufferPosition = 0;
+                                        BTConSingleton.getInstance().handler.post(new Runnable()
                                         {
                                             public void run()
                                             {
@@ -161,14 +155,14 @@ public class MainActivity extends ActionBarActivity {
                                     }
                                     else
                                     {
-                                        CarARCApp.readBuffer[CarARCApp.readBufferPosition++] = b;
+                                        BTConSingleton.getInstance().readBuffer[BTConSingleton.getInstance().readBufferPosition++] = b;
                                     }
                                 }
                             }
                         }
                         catch (IOException ex)
                         {
-                            CarARCApp.stopWorker = true;
+                            BTConSingleton.getInstance().stopWorker = true;
                         }
                     }
                 }
@@ -188,7 +182,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
-            CarARCApp.btSocket.close();
+            BTConSingleton.getInstance().btSocket.close();
         } catch (IOException e) {
             Log.d(TAG, "Unable to close properly the connection");
         }
