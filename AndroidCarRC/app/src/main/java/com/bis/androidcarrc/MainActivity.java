@@ -73,7 +73,9 @@ public class MainActivity extends ActionBarActivity {
 
     public void showController(View v){
         // Show Controller activity
-        
+
+        Intent intent = new Intent(this, ControllerActivity.class);
+        startActivity(intent);
     }
 
     public void sendTest(View view){
@@ -119,14 +121,6 @@ public class MainActivity extends ActionBarActivity {
 
             outStream = btSocket.getOutputStream();
             inStream = btSocket.getInputStream();
-
-            String message = "Test command\r\n";
-            textarea.append("\nSending..."+message);
-            Log.d(TAG,"\nSending..."+message);
-
-            byte[] msgBuffer = message.getBytes();
-
-            outStream.write(msgBuffer);
 
             Thread workerThread = new Thread(new Runnable()
             {
