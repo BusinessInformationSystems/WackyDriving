@@ -71,6 +71,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void showController(View v){
+        // Show Controller activity
+        
+    }
+
     public void sendTest(View view){
         EditText cmdBox = (EditText)findViewById(R.id.cmdBox);
         TextView textarea = (TextView)findViewById(R.id.textView);
