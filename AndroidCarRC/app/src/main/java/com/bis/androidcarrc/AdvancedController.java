@@ -46,6 +46,10 @@ public class AdvancedController extends Activity implements View.OnTouchListener
         return returnValue;
     }
 
+    public void moveImageToPoint(){
+
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
@@ -55,6 +59,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
             originX = x;
             originY = y;
             isTouching = true;
+
         }else if (event.getAction() == MotionEvent.ACTION_MOVE){
             if(isTouching){
 

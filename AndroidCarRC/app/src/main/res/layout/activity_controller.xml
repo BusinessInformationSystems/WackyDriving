@@ -7,10 +7,15 @@
         android:layout_height="match_parent"
         android:id="@+id/touchView"
         android:layout_centerInParent="true"
+        android:background="@color/gold"
         />
 
     <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:id="@+id/padBGImageView"
+        android:visibility="invisible"
+        android:src="@drawable/rb_analog_bg"
         />
 </RelativeLayout>
