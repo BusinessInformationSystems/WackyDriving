@@ -30,6 +30,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
     private float originY = 0;
 
     private boolean isTouching = false;
+    private ImageView padBGImageView;
 
 
     @Override
@@ -38,6 +39,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
         setContentView(R.layout.activity_controller);
         touchView = findViewById(R.id.touchView);
         touchView.setOnTouchListener(this);
+        padBGImageView = (ImageView) findViewById(R.id.padBGImageView);
     }
 
     public int convertPxToDp(float pixel){
@@ -46,7 +48,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
         return returnValue;
     }
 
-    public void moveImageToPoint(){
+    public void moveImageToPoint(int id, float xPixel, float yPixel){
 
     }
 
@@ -59,8 +61,11 @@ public class AdvancedController extends Activity implements View.OnTouchListener
             originX = x;
             originY = y;
             isTouching = true;
+            padBGImageView.setVisibility(View.VISIBLE);
+            moveImageToPoint(R.id.padBGImageView,originX,originY);
 
         }else if (event.getAction() == MotionEvent.ACTION_MOVE){
+
             if(isTouching){
 
                 // Get the difference of movement from Origin
@@ -92,6 +97,7 @@ public class AdvancedController extends Activity implements View.OnTouchListener
             isTouching = false;
             sendMsg("TWR 0");
             sendMsg("MVF 0");
+            padBGImageView.setVisibility(View.INVISIBLE);
         }
         return true;
     }
