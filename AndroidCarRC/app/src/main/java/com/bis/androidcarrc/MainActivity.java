@@ -181,10 +181,12 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            BTConSingleton.getInstance().btSocket.close();
-        } catch (IOException e) {
-            Log.d(TAG, "Unable to close properly the connection");
+        if(BTConSingleton.getInstance().btSocket != null) {
+            try {
+                BTConSingleton.getInstance().btSocket.close();
+            } catch (IOException e) {
+                Log.d(TAG, "Unable to close properly the connection");
+            }
         }
     }
 

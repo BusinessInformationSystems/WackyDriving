@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -104,12 +105,26 @@ public class AdvancedController extends Activity implements View.OnTouchListener
             originX = 0;
             originY = 0;
             isTouching = false;
-            sendMsg("TWR 0");
             sendMsg("MVF 0");
             padBGImageView.setVisibility(View.INVISIBLE);
             padThumbImageView.setVisibility(View.INVISIBLE);
+            sendMsg("TWR 0");
         }
         return true;
+    }
+
+    public void switchLights(View v){
+        if (((Button)v).getText() == "Lights On"){
+            sendMsg("LO");
+            ((Button)v).setText("Lights Off");
+        }else{
+            sendMsg("LF");
+            ((Button)v).setText("Lights On");
+        }
+    }
+
+    public void playHorn(View v) {
+        sendMsg("HH");
     }
 
     private int calculateMotorValue(int progress) {

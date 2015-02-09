@@ -2,11 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@color/material_blue_grey_800"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/buttonsGroup"
+        >
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lights On"
+            android:id="@+id/lightsBtn"
+            android:layout_weight="1"
+            android:onClick="switchLights"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Horn"
+            android:id="@+id/hornBtn"
+            android:layout_weight="1"
+            android:onClick="playHorn"
+            />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/touchView"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/buttonsGroup"
         android:background="@color/gold"
         />
 
@@ -26,4 +53,6 @@
         android:visibility="visible"
         android:src="@drawable/toggle_thumb_image"
         />
+
+
 </RelativeLayout>
