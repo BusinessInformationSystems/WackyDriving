@@ -12,6 +12,7 @@ int drivingMotorDirectionPinB    = 13;
 int drivingMotorSpeedPin         = 10;
 
 int buzzerPin                    = 5;
+int lightsPin                    = 4;
 
 SoftwareSerial BlueToothSerial(RxD,TxD);
 char flag=1;
@@ -30,6 +31,12 @@ void setupBuzzer()
 {
   pinMode(buzzerPin, OUTPUT);
   digitalWrite(buzzerPin, LOW);   
+}
+
+void setupLights()
+{
+  pinMode(lightsPin, OUTPUT);
+  digitalWrite(lightsPin, HIGH);   
 }
 
 void Test_BlueTooth()
@@ -119,6 +126,7 @@ void setup()
 {
   setupMotor();
   setupBuzzer();
+  setupLights();
   Serial.begin(38400);     
   BlueToothSerial.begin(38400); 
   delay(500);
@@ -224,6 +232,16 @@ void processTurn(String input)
   }
 }
 
+void turnLightsOn()
+{
+  digitalWrite(lightsPin, LOW);
+}
+
+void turnLightsOff()
+{
+  digitalWrite(lightsPin, HIGH);
+}
+
 void processCommand(String input)
 {
   String aCommand = input.substring(0,2);  
@@ -238,6 +256,14 @@ void processCommand(String input)
   else if(aCommand == "HH")
   {
     honkTheHorn(); 
+  }
+  else if(aCommand == "LO")
+  {
+    turnLightsOn();
+  }
+  else if(aCommand == "LF")
+  {
+    turnLightsOff();
   }
   else
   {
@@ -266,8 +292,10 @@ void honkTheHorn()
      delay(tempo / 2);    
   } 
   */
-  playNote('c',300);
   Serial.println("Honking the Horn!");
+  playNote('c',300);
+  delay(300);
+  playNote('c',300);
 }
 String aString;
 void loop()
